@@ -851,6 +851,7 @@ END;
 		$generated_page_name = $page_name_formula;
 		$new_text = "";
 		$original_page_content = $existing_page_content;
+		$freeTextEditor = null;
 
 		// Disable all form elements if user doesn't have edit
 		// permission - two different checks are needed, because
@@ -1223,6 +1224,8 @@ END;
 								$default_value = $cur_value;
 							}
 							$freeTextInput = new PFTextAreaInput( $input_number = null, $default_value, 'pf_free_text', ( $form_is_disabled || $form_field->isRestricted() ), $form_field->getFieldArgs() );
+							$freeTextEditor = $freeTextInput->getEditor();
+
 							$freeTextInput->addJavaScript();
 							$new_text = $freeTextInput->getHtmlText();
 							if ( $form_field->hasFieldArg( 'edittools' ) ) {
@@ -1933,7 +1936,7 @@ END;
 			$form_page_title = null;
 		}
 
-		return [ $form_text, $page_text, $form_page_title, $generated_page_name ];
+		return [ $form_text, $page_text, $form_page_title, $generated_page_name, $freeTextEditor ];
 	}
 
 	/**
