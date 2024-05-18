@@ -326,4 +326,8 @@ class PFTextAreaInput extends PFFormInput {
 		return $text;
 	}
 
+	// @see https://github.com/gesinn-it-pub/mediawiki-extensions-PageForms/issues/61
+	public function getEditor(): string {
+		return $this->mEditor;
+	}
 }
