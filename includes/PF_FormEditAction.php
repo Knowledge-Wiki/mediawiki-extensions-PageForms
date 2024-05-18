@@ -139,6 +139,14 @@ class PFFormEditAction extends Action {
 			$content_actions[$key] = $tab_values[$i];
 		}
 
+		if ( self::getFreeTextEditor( $form_names[0] ) === 'visualeditor' ) {
+			unset( $content_actions['ve-edit'] );
+			// ** this is an hack, prevents
+			// ve.init.mw.DesktopArticleTarget.init.js -> setupMultiTabs
+			// from altering tabs again
+			$content_actions['formedit']['id'] = 'ca-viewsource';
+		}
+
 		if ( !$obj->getUser()->isAllowed( 'viewedittab' ) ) {
 			// The tab can have either of these two actions.
 			unset( $content_actions['edit'] );
@@ -147,6 +155,34 @@ class PFFormEditAction extends Action {
 
 		// always return true, in order not to stop MW's hook processing!
 		return true;
+	}
+
+	// @see https://github.com/gesinn-it-pub/mediawiki-extensions-PageForms/issues/61
+	static function getFreeTextEditor( $formName ) {
+		global $wgPageFormsFormPrinter;
+		$formTitle = Title::makeTitleSafe( PF_NS_FORM, $formName );
+
+		$formDefinition = PFUtils::getPageText( $formTitle );
+		$form_submitted = false;
+		$source_is_page = false;
+		$form_id = null;
+		$existing_page_content = null;
+		$page_name = null;
+		$page_name_formula = null;
+		$is_query = false;
+		$is_embedded = false;
+		$is_autocreate = false;
+		$autocreate_query = [];
+		$user = null;
+
+		list( $formText, $pageText, $formPageTitle, $generatedPageName, $freeTextEditor ) =
+			$wgPageFormsFormPrinter->formHTML(
+				$formDefinition, $form_submitted, $source_is_page, $form_id, $existing_page_content,
+				$page_name, $page_name_formula, $is_query, $is_embedded, $is_autocreate, $autocreate_query,
+				$user
+			);
+
+		return $freeTextEditor;
 	}
 
 	static function displayFormChooser( $output, $title ) {
