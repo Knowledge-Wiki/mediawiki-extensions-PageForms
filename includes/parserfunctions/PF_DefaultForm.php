@@ -27,6 +27,9 @@ class PFDefaultForm {
 			$parserOutput->setProperty( 'PFDefaultForm', $defaultForm );
 		}
 
+		$options = array_slice( $params, 2 );
+		$parserOutput->setExtensionData( 'PFDefaultFormOptions', $options );
+
 		// Display information on the page, if this is a category.
 		if ( $curTitle->getNamespace() == NS_CATEGORY ) {
 			$defaultFormPage = Title::makeTitleSafe( PF_NS_FORM, $defaultForm );
