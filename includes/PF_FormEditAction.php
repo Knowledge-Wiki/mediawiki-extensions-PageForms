@@ -139,6 +139,8 @@ class PFFormEditAction extends Action {
 			$content_actions[$key] = $tab_values[$i];
 		}
 
+		self::handlePFDefaultFormOptions( $obj, $content_actions );
+
 		if ( !$obj->getUser()->isAllowed( 'viewedittab' ) ) {
 			// The tab can have either of these two actions.
 			unset( $content_actions['edit'] );
@@ -147,6 +149,28 @@ class PFFormEditAction extends Action {
 
 		// always return true, in order not to stop MW's hook processing!
 		return true;
+	}
+
+	/**
+	 * @see https://github.com/gesinn-it-pub/mediawiki-extensions-PageForms/issues/61
+	 * @param IContextSource $obj
+	 * @param array &$content_actions
+	 */
+	static function handlePFDefaultFormOptions( $obj, &$content_actions ) {
+		$user = $obj->getUser();
+		$wikiPage = $obj->getWikiPage();
+		$parserOptions = ParserOptions::newFromUser( $user );
+		$parserOutput = $wikiPage->getParserOutput( $parserOptions );
+		$PFDefaultFormOptions = $parserOutput->getExtensionData( 'PFDefaultFormOptions' );
+		if ( $PFDefaultFormOptions !== null ) {
+			if ( in_array( 'no-ve-edit', $PFDefaultFormOptions ) ) {
+				unset( $content_actions['ve-edit'] );
+				// ** this is an hack, prevents
+				// ve.init.mw.DesktopArticleTarget.init.js -> setupMultiTabs
+				// from altering tabs again
+				$content_actions['formedit']['id'] = 'ca-viewsource';
+			}
+		}
 	}
 
 	static function displayFormChooser( $output, $title ) {
